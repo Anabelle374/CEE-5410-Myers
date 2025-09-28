@@ -1,0 +1,149 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 09/23/25 15:12:01 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+      CEE 6410 - Water Resources Systems Analysis
+      Example 2.1 from Bishop Et Al Text (https://digitalcommons.usu.edu/ecstatic_all/76/)
+      Modifies Example to add a labor constraint and furthur modified to represent the vehicle
+       
+       
+       
+      THE PROBLEM:
+       
+      An irrigated farm can be planted in two crops:  eggplants and tomatoes.  Data are as fol-lows:
+       
+      Seasonal Resource
+      Inputs or Profit        Crops        Resource
+      Availability
+              Eggplant        Tomatoes
+      Water        1x103 gal/plant        2x103 gal/plant      4x106 gal/year
+      Land        4 ft2/plant        3 ft2/plant               1.2x104 ft2
+      Labor         5hr/plant        2.5/hr plant              17,500 hours
+      Profit/plant        $6        $7
+       
+                      Determine the optimal planting for the two crops.
+       
+      THE SOLUTION:
+      Uses General Algebraic Modeling System to Solve this Linear Program
+       
+      David E Rosenberg
+      david.rosenberg@usu.edu
+      September 15, 2015
+  30   
+  31  * 1. DEFINE the SETS
+  32  SETS plnt crops growing /Eggplant, Tomatoes/
+  33       res resources /Water, Land, Labor/
+  34  * for car production
+  35       cars Cars to produce / Coups, Minivans /
+  36       materials Materials used to produce vehicles / Metal, CircuitBoards, Labor/;
+  37   
+  38  * 2. DEFINE input data
+  39  PARAMETERS
+  40     c(plnt) Objective function coefficients ($ per plant)
+  41           /Eggplant 6,
+  42           Tomatoes 7/
+  43     b(res) Right hand constraint values (per resource)
+  44            /Water 4000000,
+  45             Land  12000,
+  46             Labor  17500/
+  47   
+  48      carprofit(cars) Profit per car produced ($ per car)
+  49       / coups 6
+  50       minivans 7/
+  51   
+  52      carconstrains(materials) Righthand constraint values for car production (per resource)
+  53       /Metal 4000000
+  54       CircuitBoard 120000
+****                  $170
+**** 170  Domain violation for element
+  55       Labor 17500/;
+  56   
+  57   
+  58   
+  59      carconstraints(materials)
+****                   $140
+**** 140  Unknown symbol
+  60  TABLE A(plnt,res) Left hand side constraint coefficients
+****      $36
+****  36  '=' or '..' or ':=' or '$=' operator expected
+****      rest of statement ignored
+  61                   Water    Land   Labor
+  62   Eggplant        1000      4       5
+  63   Tomatoes        2000      3       2.5;
+  64   
+  65  TABLE Z(cars,materials) Left hand side constraint coefficients for the car problem
+  66                   Metal    CircuitBoards   Labor
+  67   Coups        1000      4       5
+****                          $225
+**** 225  Floating entry ignored
+  68   Minivans        2000      3       2.5;
+****                                       $226
+**** 226  Multiple entry ignored
+  69   
+  70  * 3. DEFINE the variables
+  71  VARIABLES X(plnt) plants planted (Number)
+  72            VPROFIT  total profit ($);
+  73   
+  74  VARIABLES W(cars) cars to produce (Number)
+  75          CPROFIT total profit from producing cars ($);
+  76   
+  77  * Non-negativity constraints
+  78  POSITIVE VARIABLES X, W;
+  79   
+  80  * 4. COMBINE variables and data in equations
+  81  EQUATIONS
+  82     PROFIT Total profit ($) and objective function value
+  83     RES_CONSTRAIN(res) Resource Constraints
+  84     PROFITCARS Toatal profit from producing cars ($) the objective function value
+  85     MATERIALCONTRAINT(materials) Rsources used to produce cars;
+  86   
+  87   
+  88  PROFIT..                 VPROFIT =E= SUM(plnt, c(plnt)*X(plnt));
+  89  RES_CONSTRAIN(res) ..    SUM(plnt, A(plnt,res)*X(plnt)) =L= b(res);
+  90   
+  91  PROFITCARS..        CPROFIT =E= SUM(cars, carprofit(cars)*W(cars));
+  92  MATERIALCONTRAINTS(materials).. SUM(cars, Z(cars,materials)*W(cars)) =L= carconstraints
+****                   $140
+**** 140  Unknown symbol
+  93   
+  94   
+  95   
+  96  * 5. DEFINE the MODEL from the EQUATIONS
+  97  MODEL PLANTING /PROFIT, RES_CONSTRAIN/;
+****      $148
+**** 148  Dimension different - The symbol is referenced with more/less
+****         indices as declared
+  98  MODEL CARPRODUCTION / PROFITCARS, MATERIALCONTRAINTS/;
+  99  *Altnerative way to write (include all previously defined equations)
+ 100  *MODEL PLANTING /ALL/;
+ 101   
+ 102   
+ 103  * 6. SOLVE the MODEL
+ 104  * Solve the PLANTING model using a Linear Programming Solver (see File=>Options=>Solvers)
+ 105  *     to maximize VPROFIT
+ 106  *SOLVE PLANTING USING LP MAXIMIZING VPROFIT;
+ 107  SOLVE CARPRPRODUCTION USING LP MAXIMIXING CPROFIT;
+****                      $140,241                     $257
+**** 140  Unknown symbol
+**** 241  Model has not been defined
+**** 257  Solve statement not checked because of previous errors
+ 108   
+ 109  * 6. CLick File menu => RUN (F9) or Solve icon and examine solution report in .LST file
+
+**** 10 ERROR(S)   0 WARNING(S)
+
+
+COMPILATION TIME     =        0.002 SECONDS      3 MB  51.1.0 2d039df5 DAX-DAC
+
+
+USER: GAMS Demo, for EULA and demo limitations see   G250826+0003Cc-GEN
+      https://www.gams.com/latest/docs/UG%5FLicense.html         DC0000
+
+
+**** FILE SUMMARY
+
+Input      /Users/anabelle/Documents/GAMS/Cars.gms
+Output     /Users/anabelle/Documents/GAMS/Cars.lst
+
+**** USER ERROR(S) ENCOUNTERED

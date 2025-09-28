@@ -1,0 +1,13 @@
+qt.qpa.fonts: Populating font family aliases took 40 ms. Replace uses of missing font family "Source Code Pro" with one that exists to avoid this cost. 
+Default system font: Menlo size 10
+settings initialized
+Info [15:10:16]: Started: /Applications/GAMS Studio 51.app/Contents/MacOS/studio
+GAMS Studio 1.22.1 on macOS Sequoia (15.5) arm64 build 24.5.0
+Added editor 1 to /Users/anabelle/Documents/GAMS/Cars.gms
+Info [15:10:17]: GAMS license found at /Library/Frameworks/GAMS.framework/Versions/51/Resources/gamslice.txt
+GAMScom-Server: Studio connected to GAMS on port 3563
+Added editor 1 to /Users/anabelle/Documents/GAMS/Ex2-1-labor.gms.~log
+Info [15:12:01]: Running: /Library/Frameworks/GAMS.framework/Versions/51/Resources/gams /Users/anabelle/Documents/GAMS/Cars.gms logoption=3 ide=1 errorlog=99 errmsg=1 pagesize=0 lstTitleleftaligned=1
+Deleted 1/1 editors of /Users/anabelle/Documents/GAMS/Cars.gms
+Missed to close /Users/anabelle/Documents/GAMS/Ex2-1-labor.gms.~log
+Deleted 1/1 editors of /Users/anabelle/Documents/GAMS/Ex2-1-labor.gms.~log

@@ -1,0 +1,11 @@
+qt.qpa.fonts: Populating font family aliases took 40 ms. Replace uses of missing font family "Source Code Pro" with one that exists to avoid this cost. 
+Default system font: Menlo size 10
+settings initialized
+Info [15:15:56]: Started: /Applications/GAMS Studio 51.app/Contents/MacOS/studio
+GAMS Studio 1.22.1 on macOS Sequoia (15.5) arm64 build 24.5.0
+Added editor 1 to /Users/anabelle/Documents/GAMS/Cars.gms
+Info [15:15:56]: GAMS license found at /Library/Frameworks/GAMS.framework/Versions/51/Resources/gamslice.txt
+QObject::disconnect: wildcard call disconnects from destroyed signal of gams::studio::CodeCompleter::unnamed
+QIODevice::write (QFile, "/Users/anabelle/Documents/GAMS/~~$Cars.gms"): device not open
+QIODevice::write (QFile, "/Users/anabelle/Documents/GAMS/~~$Cars.gms"): device not open
+QIODevice::write (QFile, "/Users/anabelle/Documents/GAMS/~~$Cars.gms"): device not open
