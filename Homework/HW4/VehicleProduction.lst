@@ -1,0 +1,223 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 11/29/25 15:09:40 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+      CEE 6410 - Water Resources Systems Analysis
+       
+      THE PROBLEM:
+       
+       
+       
+       
+      THE SOLUTION:
+      Uses General Algebraic Modeling System to Solve this Linear Program
+       
+      Anabelle Myers
+  14   
+  15  * 1. DEFINE the SETS
+  16  SETS prdc crops growing /Trucks, Sedans/
+  17       res resources /Tanks, Rows, Drive, Vehicles/;
+  18   
+  19  * 2. DEFINE input data
+  20  PARAMETERS
+  21     c(prdc) Objective function coefficients ($ per vehicle)
+  22           /Trucks 100,
+  23           Sedans 110/
+  24     b(res) Right hand constraint values (per resource)
+  25            /Tanks 14000,
+  26             Rows  18000,
+  27             Drive 6000
+  28             Vehicles 10000 /;
+  29   
+  30  TABLE A(prdc,res) Left hand side constraint coefficients
+  31                   Tanks    Rows    Drive   Vehicles
+  32   Trucks            2       1        1       1
+  33   Sedans            1       2        0       1 ;
+  34   
+  35  * 3. DEFINE the variables
+  36  VARIABLES X(prdc) vehicles planted (Number)
+  37            VPROFIT  total profit ($);
+  38   
+  39  * Non-negativity constraints
+  40  POSITIVE VARIABLES X;
+  41   
+  42  * 4. COMBINE variables and data in equations
+  43  EQUATIONS
+  44     PROFIT Total profit ($) and objective function value
+  45     RES_CONSTRAIN(res) Resource Constraints;
+  46   
+  47  PROFIT..                 VPROFIT =E= SUM(prdc,c(prdc)*X(prdc));
+  48  RES_CONSTRAIN(res) ..    SUM(prdc,A(prdc,res)*X(prdc)) =L= b(res);
+  49   
+  50  * 5. DEFINE the MODEL from the EQUATIONS
+  51  MODEL PRODUCING /PROFIT, RES_CONSTRAIN/;
+  52  *Altnerative way to write (include all previously defined equations)
+  53  *MODEL PRODUCING /ALL/;
+  54   
+  55  PRODUCING.optfile = 1;
+  56   
+  57  * 6. SOLVE the MODEL
+  58  * Solve the PRODUCING model using a Linear Programming Solver (see File=>Options=>Solvers)
+  59  *     to maximize VPROFIT
+  60  SOLVE PRODUCING USING LP MAXIMIZING VPROFIT;
+  61   
+  62  * 6. CLick File menu => RUN (F9) or Solve icon and examine solution report in .LST file
+
+
+COMPILATION TIME     =        0.001 SECONDS      3 MB  51.1.0 2d039df5 DAX-DAC
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 11/29/25 15:09:40 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE PRODUCING Using LP From line 60
+
+
+---- PROFIT  =E=  Total profit ($) and objective function value
+
+PROFIT..  - 100*X(Trucks) - 110*X(Sedans) + VPROFIT =E= 0 ; (LHS = 0)
+     
+
+---- RES_CONSTRAIN  =L=  Resource Constraints
+
+RES_CONSTRAIN(Tanks)..  2*X(Trucks) + X(Sedans) =L= 14000 ; (LHS = 0)
+     
+RES_CONSTRAIN(Rows)..  X(Trucks) + 2*X(Sedans) =L= 18000 ; (LHS = 0)
+     
+RES_CONSTRAIN(Drive)..  X(Trucks) =L= 6000 ; (LHS = 0)
+     
+REMAINING ENTRY SKIPPED
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 11/29/25 15:09:40 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE PRODUCING Using LP From line 60
+
+
+---- X  vehicles planted (Number)
+
+X(Trucks)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+     -100       PROFIT
+        2       RES_CONSTRAIN(Tanks)
+        1       RES_CONSTRAIN(Rows)
+        1       RES_CONSTRAIN(Drive)
+        1       RES_CONSTRAIN(Vehicles)
+
+X(Sedans)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+     -110       PROFIT
+        1       RES_CONSTRAIN(Tanks)
+        2       RES_CONSTRAIN(Rows)
+        1       RES_CONSTRAIN(Vehicles)
+
+
+---- VPROFIT  total profit ($)
+
+VPROFIT
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       PROFIT
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 11/29/25 15:09:40 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE PRODUCING Using LP From line 60
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 6.000E+03, 1.800E+04] - Zero values observed as well
+Bound     [min, max] : [        NA,        NA] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 1.100E+02]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 11/29/25 15:09:40 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE PRODUCING Using LP From line 60
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            5
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            3
+NON ZERO ELEMENTS            10
+
+
+GENERATION TIME      =        0.005 SECONDS      4 MB  51.1.0 2d039df5 DAX-DAC
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 11/29/25 15:09:40 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE PRODUCING Using LP From line 60
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   PRODUCING           OBJECTIVE  VPROFIT
+     TYPE    LP                  DIRECTION  MAXIMIZE
+     SOLVER  CPLEX               FROM LINE  60
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE          1080000.0000
+
+ RESOURCE USAGE, LIMIT          0.004 10000000000.000
+ ITERATION COUNT, LIMIT         3    2147483647
+*** This solver runs with a demo license. No commercial use.
+
+*** Error Cannot open parameter file "/Users/anabelle/Documents/Systems Analysis/CEE-5410-Myers/Homework/HW4/cplex.opt"
+*** Error Error code = 2; No such file or directory
+
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.2.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- LP status (1): optimal.
+--- Cplex Time: 0.00sec (det. 0.01 ticks)
+
+
+Optimal solution found
+Objective:      1080000.000000
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU PROFIT              .              .              .             1.0000      
+
+  PROFIT  Total profit ($) and objective function value
+
+---- EQU RES_CONSTRAIN  Resource Constraints
+
+                LOWER          LEVEL          UPPER         MARGINAL
+
+Tanks           -INF        12000.0000     14000.0000          .          
+Rows            -INF        18000.0000     18000.0000        10.0000      
+Drive           -INF         2000.0000      6000.0000          .          
+Vehicles        -INF        10000.0000     10000.0000        90.0000      
+
+---- VAR X  vehicles planted (Number)
+
+              LOWER          LEVEL          UPPER         MARGINAL
+
+Trucks          .          2000.0000        +INF             .          
+Sedans          .          8000.0000        +INF             .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR VPROFIT           -INF      1080000.0000        +INF             .          
+
+  VPROFIT  total profit ($)
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+
+
+EXECUTION TIME       =        0.044 SECONDS      4 MB  51.1.0 2d039df5 DAX-DAC
+
+
+USER: GAMS Demo, for EULA and demo limitations see   G250826+0003Cc-GEN
+      https://www.gams.com/latest/docs/UG%5FLicense.html         DC0000
+
+
+**** FILE SUMMARY
+
+Input      /Users/anabelle/Documents/Systems Analysis/CEE-5410-Myers/Homework/HW4/VehicleProduction.gms
+Output     /Users/anabelle/Documents/Systems Analysis/CEE-5410-Myers/Homework/HW4/VehicleProduction.lst
