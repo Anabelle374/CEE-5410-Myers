@@ -1,0 +1,28 @@
+B 3 C o m p i l a t i o n
+B 99 Equation Listing    SOLVE RESERVOIR Using LP From line 90
+D 102 BENEFIT
+D 107 MASS_BAL
+D 118 RES_CAP
+D 129 TURB_CAP
+D 140 MINFLOW
+D 151 FINAL_STORAGE
+B 157 Column Listing      SOLVE RESERVOIR Using LP From line 90
+E 160 Hyd_Release
+E 185 Irr_Release
+E 204 Release
+E 223 Storage
+E 245 Total_Benefit
+B 253 Range Statistics    SOLVE RESERVOIR Using LP From line 90
+B 264 Model Statistics    SOLVE RESERVOIR Using LP From line 90
+B 277 Solution Report     SOLVE RESERVOIR Using LP From line 90
+F 314 BENEFIT
+F 318 MASS_BAL
+F 329 RES_CAP
+F 340 TURB_CAP
+F 351 MINFLOW
+F 364 FINAL_STORAGE
+G 368 Hyd_Release
+G 379 Irr_Release
+G 390 Release
+G 401 Storage
+G 414 Total_Benefit

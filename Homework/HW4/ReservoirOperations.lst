@@ -1,0 +1,434 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/03/25 19:27:58 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+      CEE 6410 - Water Resources Systems Analysis
+       
+      Anabelle Myers
+   6   
+   7  * 1. DEFINE the SETS
+   8  SETS t /1, 2, 3, 4, 5, 6/;
+   9   
+  10  * 2. DEFINE input data
+  11  PARAMETERS
+  12     Inflow(t) Inflow (unit)
+  13      /1 2,
+  14       2 2,
+  15       3 3,
+  16       4 4,
+  17       5 3,
+  18       6 2/
+  19   
+  20     HydBen(t) Hydropower Benefit ($ per unit)
+  21      /1 1.6,
+  22       2 1.7,
+  23       3 1.8,
+  24       4 1.9,
+  25       5 2.0,
+  26       6 2.0/
+  27   
+  28     IrrBen(t) Irrigation Benfit ($ per unit)
+  29      /1 1.0,
+  30       2 1.2,
+  31       3 1.9,
+  32       4 2.0,
+  33       5 2.2,
+  34       6 2.2/;
+  35   
+  36  SCALARS
+  37     Max_Res      Reservoir Capacity (unit)          /9/
+  38     Max_Turb     Turbine Capacity (unit per month)  /4/
+  39     Init_Storage Initial Storage (unit)             /5/
+  40     MinFlow_A    Minimum Flow at A                  /1/;
+  41   
+  42   
+  43  * 3. DEFINE the variables
+  44  VARIABLES
+  45     Hyd_Release(t)  Flow through turbines (units)
+  46     Irr_Release(t)  Irrigation diversion (units)
+  47     Release(t)      Bypass per non-turbine release (units)
+  48     Storage(t)      Storage at end of month t (units)
+  49     Total_Benefit   Total economic benefit ($);
+  50   
+  51  * Non-negativity constraints
+  52  POSITIVE VARIABLES Hyd_Release, Irr_Release, Release, Storage;
+  53   
+  54  * 4. COMBINE variables and data in equations
+  55  EQUATIONS
+  56     BENEFIT          Benefit
+  57     MASS_BAL(t)      Reservoir storage
+  58     RES_CAP(t)       Reservoir capacity
+  59     TURB_CAP(t)      Turbine capacity
+  60     MINFLOW(t)       Flow available for irrigation and min flow at A
+  61     FINAL_STORAGE    Ending storage;
+  62   
+  63  BENEFIT..
+  64      Total_Benefit =E= SUM(t, HydBen(t)*Hyd_Release(t) + IrrBen(t)*Irr_Release(t));
+  65   
+  66  * Water leaves storage only once as Hyd_Release + Release.
+  67  MASS_BAL(t)..
+  68     Storage(t) =E=
+  69        ( Init_Storage + Inflow(t) - Hyd_Release(t) - Release(t) )$(ORD(t) = 1)
+  70      + ( Storage(t-1) + Inflow(t) - Hyd_Release(t) - Release(t) )$(ORD(t) > 1);
+  71   
+  72  RES_CAP(t)..
+  73      Storage(t) =L= Max_Res;
+  74   
+  75  TURB_CAP(t)..
+  76      Hyd_Release(t) =L= Max_Turb;
+  77   
+  78  MINFLOW(t)..
+  79      Irr_Release(t) + MinFlow_A =L= Hyd_Release(t) + Release(t);
+  80   
+  81  FINAL_STORAGE..
+  82      Storage('6') =G= Init_Storage;
+  83   
+  84  * 5. DEFINE the MODEL from the EQUATIONS
+  85  MODEL RESERVOIR /ALL/;
+  86   
+  87  RESERVOIR.optfile = 1;
+  88   
+  89  * 6. SOLVE the MODEL
+  90  SOLVE RESERVOIR USING LP MAXIMIZING Total_Benefit;
+
+
+COMPILATION TIME     =        0.002 SECONDS      3 MB  51.1.0 2d039df5 DAX-DAC
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/03/25 19:27:58 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE RESERVOIR Using LP From line 90
+
+
+---- BENEFIT  =E=  Benefit
+
+BENEFIT..  - 1.6*Hyd_Release(1) - 1.7*Hyd_Release(2) - 1.8*Hyd_Release(3) - 1.9*Hyd_Release(4) - 2*Hyd_Release(5) - 2*Hyd_Release(6) - Irr_Release(1) - 1.2*Irr_Release(2) - 1.9*Irr_Release(3) - 2*Irr_Release(4) - 2.2*Irr_Release(5) - 2.2*Irr_Release(6) + Total_Benefit =E= 0 ; (LHS = 0)
+     
+
+---- MASS_BAL  =E=  Reservoir storage
+
+MASS_BAL(1)..  Hyd_Release(1) + Release(1) + Storage(1) =E= 7 ; (LHS = 0, INFES = 7 ****)
+     
+MASS_BAL(2)..  Hyd_Release(2) + Release(2) - Storage(1) + Storage(2) =E= 2 ; (LHS = 0, INFES = 2 ****)
+     
+MASS_BAL(3)..  Hyd_Release(3) + Release(3) - Storage(2) + Storage(3) =E= 3 ; (LHS = 0, INFES = 3 ****)
+     
+REMAINING 3 ENTRIES SKIPPED
+
+
+---- RES_CAP  =L=  Reservoir capacity
+
+RES_CAP(1)..  Storage(1) =L= 9 ; (LHS = 0)
+     
+RES_CAP(2)..  Storage(2) =L= 9 ; (LHS = 0)
+     
+RES_CAP(3)..  Storage(3) =L= 9 ; (LHS = 0)
+     
+REMAINING 3 ENTRIES SKIPPED
+
+
+---- TURB_CAP  =L=  Turbine capacity
+
+TURB_CAP(1)..  Hyd_Release(1) =L= 4 ; (LHS = 0)
+     
+TURB_CAP(2)..  Hyd_Release(2) =L= 4 ; (LHS = 0)
+     
+TURB_CAP(3)..  Hyd_Release(3) =L= 4 ; (LHS = 0)
+     
+REMAINING 3 ENTRIES SKIPPED
+
+
+---- MINFLOW  =L=  Flow available for irrigation and min flow at A
+
+MINFLOW(1)..  - Hyd_Release(1) + Irr_Release(1) - Release(1) =L= -1 ; (LHS = 0, INFES = 1 ****)
+     
+MINFLOW(2)..  - Hyd_Release(2) + Irr_Release(2) - Release(2) =L= -1 ; (LHS = 0, INFES = 1 ****)
+     
+MINFLOW(3)..  - Hyd_Release(3) + Irr_Release(3) - Release(3) =L= -1 ; (LHS = 0, INFES = 1 ****)
+     
+REMAINING 3 ENTRIES SKIPPED
+
+
+---- FINAL_STORAGE  =G=  Ending storage
+
+FINAL_STORAGE..  Storage(6) =G= 5 ; (LHS = 0, INFES = 5 ****)
+     
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/03/25 19:27:58 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE RESERVOIR Using LP From line 90
+
+
+---- Hyd_Release  Flow through turbines (units)
+
+Hyd_Release(1)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1.6     BENEFIT
+        1       MASS_BAL(1)
+        1       TURB_CAP(1)
+       -1       MINFLOW(1)
+
+Hyd_Release(2)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1.7     BENEFIT
+        1       MASS_BAL(2)
+        1       TURB_CAP(2)
+       -1       MINFLOW(2)
+
+Hyd_Release(3)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1.8     BENEFIT
+        1       MASS_BAL(3)
+        1       TURB_CAP(3)
+       -1       MINFLOW(3)
+
+REMAINING 3 ENTRIES SKIPPED
+
+---- Irr_Release  Irrigation diversion (units)
+
+Irr_Release(1)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1       BENEFIT
+        1       MINFLOW(1)
+
+Irr_Release(2)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1.2     BENEFIT
+        1       MINFLOW(2)
+
+Irr_Release(3)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+       -1.9     BENEFIT
+        1       MINFLOW(3)
+
+REMAINING 3 ENTRIES SKIPPED
+
+---- Release  Bypass per non-turbine release (units)
+
+Release(1)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+        1       MASS_BAL(1)
+       -1       MINFLOW(1)
+
+Release(2)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+        1       MASS_BAL(2)
+       -1       MINFLOW(2)
+
+Release(3)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+        1       MASS_BAL(3)
+       -1       MINFLOW(3)
+
+REMAINING 3 ENTRIES SKIPPED
+
+---- Storage  Storage at end of month t (units)
+
+Storage(1)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+        1       MASS_BAL(1)
+       -1       MASS_BAL(2)
+        1       RES_CAP(1)
+
+Storage(2)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+        1       MASS_BAL(2)
+       -1       MASS_BAL(3)
+        1       RES_CAP(2)
+
+Storage(3)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+        1       MASS_BAL(3)
+       -1       MASS_BAL(4)
+        1       RES_CAP(3)
+
+REMAINING 3 ENTRIES SKIPPED
+
+---- Total_Benefit  Total economic benefit ($)
+
+Total_Benefit
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       BENEFIT
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/03/25 19:27:58 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE RESERVOIR Using LP From line 90
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 1.000E+00, 9.000E+00] - Zero values observed as well
+Bound     [min, max] : [        NA,        NA] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 2.200E+00]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/03/25 19:27:58 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE RESERVOIR Using LP From line 90
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           6     SINGLE EQUATIONS           26
+BLOCKS OF VARIABLES           5     SINGLE VARIABLES           25
+NON ZERO ELEMENTS            67
+
+
+GENERATION TIME      =        0.007 SECONDS      4 MB  51.1.0 2d039df5 DAX-DAC
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/03/25 19:27:58 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE RESERVOIR Using LP From line 90
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   RESERVOIR           OBJECTIVE  Total_Benefit
+     TYPE    LP                  DIRECTION  MAXIMIZE
+     SOLVER  CPLEX               FROM LINE  90
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE               51.6000
+
+ RESOURCE USAGE, LIMIT          0.007 10000000000.000
+ ITERATION COUNT, LIMIT        18    2147483647
+*** This solver runs with a demo license. No commercial use.
+
+*** Error Cannot open parameter file "/Users/anabelle/Documents/Systems Analysis/CEE-5410-Myers/Homework/HW4/cplex.opt"
+*** Error Error code = 2; No such file or directory
+
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.2.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- LP status (1): optimal.
+--- Cplex Time: 0.01sec (det. 0.05 ticks)
+
+
+Optimal solution found
+Objective:           51.600000
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU BENEFIT             .              .              .             1.0000      
+
+  BENEFIT  Benefit
+
+---- EQU MASS_BAL  Reservoir storage
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1         7.0000         7.0000         7.0000         3.7000      
+2         2.0000         2.0000         2.0000         3.7000      
+3         3.0000         3.0000         3.0000         3.7000      
+4         4.0000         4.0000         4.0000         3.7000      
+5         3.0000         3.0000         3.0000         3.7000      
+6         2.0000         2.0000         2.0000         3.7000      
+
+---- EQU RES_CAP  Reservoir capacity
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1        -INF            6.0000         9.0000          .          
+2        -INF            7.0000         9.0000          .          
+3        -INF            8.0000         9.0000          .          
+4        -INF            8.0000         9.0000          .          
+5        -INF            7.0000         9.0000          .          
+6        -INF            5.0000         9.0000          .          
+
+---- EQU TURB_CAP  Turbine capacity
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1        -INF            1.0000         4.0000          .          
+2        -INF            1.0000         4.0000          .          
+3        -INF            2.0000         4.0000          .          
+4        -INF            4.0000         4.0000         0.2000      
+5        -INF            4.0000         4.0000         0.5000      
+6        -INF            4.0000         4.0000         0.5000      
+
+---- EQU MINFLOW  Flow available for irrigation and min flow at A
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1        -INF           -1.0000        -1.0000         2.1000      
+2        -INF           -1.0000        -1.0000         2.0000      
+3        -INF           -1.0000        -1.0000         1.9000      
+4        -INF           -1.0000        -1.0000         2.0000      
+5        -INF           -1.0000        -1.0000         2.2000      
+6        -INF           -1.0000        -1.0000         2.2000      
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU FINAL_STO~         5.0000         5.0000        +INF           -3.7000      
+
+  FINAL_STORAGE  Ending storage
+
+---- VAR Hyd_Release  Flow through turbines (units)
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1          .             1.0000        +INF             .          
+2          .             1.0000        +INF             .          
+3          .             2.0000        +INF             .          
+4          .             4.0000        +INF             .          
+5          .             4.0000        +INF             .          
+6          .             4.0000        +INF             .          
+
+---- VAR Irr_Release  Irrigation diversion (units)
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1          .              .            +INF           -1.1000      
+2          .              .            +INF           -0.8000      
+3          .             1.0000        +INF             .          
+4          .             3.0000        +INF             .          
+5          .             3.0000        +INF             .          
+6          .             3.0000        +INF             .          
+
+---- VAR Release  Bypass per non-turbine release (units)
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1          .              .            +INF           -1.6000      
+2          .              .            +INF           -1.7000      
+3          .              .            +INF           -1.8000      
+4          .              .            +INF           -1.7000      
+5          .              .            +INF           -1.5000      
+6          .              .            +INF           -1.5000      
+
+---- VAR Storage  Storage at end of month t (units)
+
+         LOWER          LEVEL          UPPER         MARGINAL
+
+1          .             6.0000        +INF             .          
+2          .             7.0000        +INF             .          
+3          .             8.0000        +INF             .          
+4          .             8.0000        +INF             .          
+5          .             7.0000        +INF             .          
+6          .             5.0000        +INF             .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR Total_Ben~        -INF           51.6000        +INF             .          
+
+  Total_Benefit  Total economic benefit ($)
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+
+
+EXECUTION TIME       =        0.058 SECONDS      4 MB  51.1.0 2d039df5 DAX-DAC
+
+
+USER: GAMS Demo, for EULA and demo limitations see   G250826+0003Cc-GEN
+      https://www.gams.com/latest/docs/UG%5FLicense.html         DC0000
+
+
+**** FILE SUMMARY
+
+Input      /Users/anabelle/Documents/Systems Analysis/CEE-5410-Myers/Homework/HW5/ReservoirOperations.gms
+Output     /Users/anabelle/Documents/Systems Analysis/CEE-5410-Myers/Homework/HW4/ReservoirOperations.lst
