@@ -5,7 +5,7 @@ Anabelle Myers
 $offtext
 
 * 1. DEFINE the SETS
-SETS t /1, 2, 3, 4, 5, 6/;
+SETS t /1*6/;
 
 * 2. DEFINE input data
 PARAMETERS

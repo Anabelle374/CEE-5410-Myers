@@ -1,0 +1,239 @@
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/05/25 13:33:47 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+      CEE 6410 - Water Resources Systems Analysis
+       
+      THE PROBLEM:
+       
+      An aqueduct constructed to supply water to industrial users has an excess capacity in the months
+      of June, July, and August of 14,000 acft, 18,000 acft, and 6,000 acft, respectively. It is
+      proposed to develop not more than 10,000 acres of new land by utilizing the excess aqueduct
+      capacity for irrigation water deliveries. Two crops, hay and grain, are to be grown. Their
+      monthly water requirements and expected net returns are given in the following table:
+                          Monthly Water Requirement (acft/acre)
+                  June            July            August          Return, $/acre
+      Hay          2               1                1                  100
+      Grain        1               2                0                  120
+       
+                      Determine the optimal planting for the two crops.
+       
+      THE SOLUTION:
+      Uses General Algebraic Modeling System to Solve this Linear Program
+       
+      Anabelle Myers
+  23   
+  24  * 1. DEFINE the SETS
+  25  SETS plnt crops growing /Hay, Grain/
+  26       res resources /June, July, August, Land/;
+  27   
+  28  * 2. DEFINE input data
+  29  PARAMETERS
+  30     c(plnt) Objective function coefficients ($ per plant)
+  31           /Hay 100,
+  32           Grain 120/
+  33     b(res) Right hand constraint values (per resource)
+  34            /June 14000,
+  35             July  18000,
+  36             August 6000
+  37             Land 10000 /;
+  38   
+  39  TABLE A(plnt,res) Left hand side constraint coefficients
+  40                   June    July    August   Land
+  41   Hay              2       1        1       1
+  42   Grain            1       2        0       1 ;
+  43   
+  44  * 3. DEFINE the variables
+  45  VARIABLES X(plnt) plants planted (Number)
+  46            VPROFIT  total profit ($)
+  47            Y(res)  value of resources used (units specific to variable)
+  48            VREDCOST total reduced cost ($);
+  49  * Non-negativity constraints
+  50  POSITIVE VARIABLES X,Y;
+  51   
+  52  * 4. COMBINE variables and data in equations
+  53  EQUATIONS
+  54     PROFIT_PRIMAL Total profit ($) and objective function value
+  55     RES_CONS_PRIMAL(res) Resource Constraints
+  56     REDCOST_DUAL Reduced Cost ($) associated with using resources
+  57     RES_CONS_DUAL(plnt) Profit levels;
+  58   
+  59  *Primal Equations
+  60  PROFIT_PRIMAL..                 VPROFIT =E= SUM(plnt,c(plnt)*X(plnt));
+  61  RES_CONS_PRIMAL(res) ..    SUM(plnt,A(plnt,res)*X(plnt)) =L= b(res);
+  62   
+  63  *Dual Equations
+  64  REDCOST_DUAL..                 VREDCOST =E= SUM(res,b(res)*Y(res));
+  65  RES_CONS_DUAL(plnt)..          sum(res,A(plnt,res)*Y(res)) =G= c(plnt);
+  66   
+  67   
+  68  * 5. DEFINE the MODEL from the EQUATIONS
+  69  *Primal Model
+  70  MODEL PLANT_PRIMAL /PROFIT_PRIMAL, RES_CONS_PRIMAL/;
+  71  *Dual Model
+  72  MODEL PLANT_DUAL / REDCOST_DUAL, RES_CONS_DUAL/;
+  73   
+  74   
+  75  * 6. SOLVE the MODEL
+  76  * Solve the PLANTING model using a Linear Programming Solver (see File=>Options=>Solvers)
+  77  *     to maximize VPROFIT
+  78  SOLVE PLANT_DUAL USING LP MINIMIZING VREDCOST;
+  79   
+  80  * 6. CLick File menu => RUN (F9) or Solve icon and examine solution report in .LST file
+  81   
+  82   
+  83   
+
+
+COMPILATION TIME     =        0.000 SECONDS      3 MB  51.1.0 2d039df5 DAX-DAC
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/05/25 13:33:47 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE PLANT_DUAL Using LP From line 78
+
+
+---- REDCOST_DUAL  =E=  Reduced Cost ($) associated with using resources
+
+REDCOST_DUAL..  - 14000*Y(June) - 18000*Y(July) - 6000*Y(August) - 10000*Y(Land) + VREDCOST =E= 0 ; (LHS = 0)
+     
+
+---- RES_CONS_DUAL  =G=  Profit levels
+
+RES_CONS_DUAL(Hay)..  2*Y(June) + Y(July) + Y(August) + Y(Land) =G= 100 ; (LHS = 0, INFES = 100 ****)
+     
+RES_CONS_DUAL(Grain)..  Y(June) + 2*Y(July) + Y(Land) =G= 120 ; (LHS = 0, INFES = 120 ****)
+     
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/05/25 13:33:47 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE PLANT_DUAL Using LP From line 78
+
+
+---- Y  value of resources used (units specific to variable)
+
+Y(June)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+   -14000       REDCOST_DUAL
+        2       RES_CONS_DUAL(Hay)
+        1       RES_CONS_DUAL(Grain)
+
+Y(July)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+   -18000       REDCOST_DUAL
+        1       RES_CONS_DUAL(Hay)
+        2       RES_CONS_DUAL(Grain)
+
+Y(August)
+                (.LO, .L, .UP, .M = 0, 0, +INF, 0)
+    -6000       REDCOST_DUAL
+        1       RES_CONS_DUAL(Hay)
+
+REMAINING ENTRY SKIPPED
+
+---- VREDCOST  total reduced cost ($)
+
+VREDCOST
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       REDCOST_DUAL
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/05/25 13:33:47 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Range Statistics    SOLVE PLANT_DUAL Using LP From line 78
+
+
+RANGE STATISTICS (ABSOLUTE NON-ZERO FINITE VALUES)
+
+RHS       [min, max] : [ 1.000E+02, 1.200E+02] - Zero values observed as well
+Bound     [min, max] : [        NA,        NA] - Zero values observed as well
+Matrix    [min, max] : [ 1.000E+00, 1.800E+04]
+
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/05/25 13:33:47 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE PLANT_DUAL Using LP From line 78
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           2     SINGLE EQUATIONS            3
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES            5
+NON ZERO ELEMENTS            12
+
+
+GENERATION TIME      =        0.003 SECONDS      4 MB  51.1.0 2d039df5 DAX-DAC
+GAMS 51.1.0  2d039df5 Sep 13, 2025          DAX-DAC arm 64bit/macOS - 12/05/25 13:33:47 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE PLANT_DUAL Using LP From line 78
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   PLANT_DUAL          OBJECTIVE  VREDCOST
+     TYPE    LP                  DIRECTION  MINIMIZE
+     SOLVER  CPLEX               FROM LINE  78
+
+**** SOLVER STATUS     1 Normal Completion
+**** MODEL STATUS      1 Optimal
+**** OBJECTIVE VALUE          1160000.0000
+
+ RESOURCE USAGE, LIMIT          0.000 10000000000.000
+ ITERATION COUNT, LIMIT         2    2147483647
+*** This solver runs with a demo license. No commercial use.
+--- GMO setup time: 0.00s
+--- GMO memory 0.50 Mb (peak 0.50 Mb)
+--- Dictionary memory 0.00 Mb
+--- Cplex 22.1.2.0 link memory 0.00 Mb (peak 0.00 Mb)
+--- Starting Cplex
+
+
+--- LP status (1): optimal.
+--- Cplex Time: 0.00sec (det. 0.00 ticks)
+
+
+Optimal solution found
+Objective:      1160000.000000
+
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- EQU REDCOST_D~          .              .              .             1.0000      
+
+  REDCOST_DUAL  Reduced Cost ($) associated with using resources
+
+---- EQU RES_CONS_DUAL  Profit levels
+
+             LOWER          LEVEL          UPPER         MARGINAL
+
+Hay         100.0000       100.0000        +INF         2000.0000      
+Grain       120.0000       120.0000        +INF         8000.0000      
+
+---- VAR Y  value of resources used (units specific to variable)
+
+              LOWER          LEVEL          UPPER         MARGINAL
+
+June            .              .            +INF         2000.0000      
+July            .            20.0000        +INF             .          
+August          .              .            +INF         4000.0000      
+Land            .            80.0000        +INF             .          
+
+                           LOWER          LEVEL          UPPER         MARGINAL
+
+---- VAR VREDCOST          -INF      1160000.0000        +INF             .          
+
+  VREDCOST  total reduced cost ($)
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+
+
+EXECUTION TIME       =        0.025 SECONDS      4 MB  51.1.0 2d039df5 DAX-DAC
+
+
+USER: GAMS Demo, for EULA and demo limitations see   G250826+0003Cc-GEN
+      https://www.gams.com/latest/docs/UG%5FLicense.html         DC0000
+
+
+**** FILE SUMMARY
+
+Input      /Users/anabelle/Documents/Systems Analysis/CEE-5410-Myers/Homework/HW6/Irrigation_Dual.gms
+Output     /Users/anabelle/Documents/Systems Analysis/CEE-5410-Myers/Homework/HW6/Irrigation_Dual.lst

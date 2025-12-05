@@ -1,0 +1,14 @@
+B 3 C o m p i l a t i o n
+B 92 Equation Listing    SOLVE PLANT_DUAL Using LP From line 78
+D 95 REDCOST_DUAL
+D 100 RES_CONS_DUAL
+B 108 Column Listing      SOLVE PLANT_DUAL Using LP From line 78
+E 111 Y
+E 132 VREDCOST
+B 140 Range Statistics    SOLVE PLANT_DUAL Using LP From line 78
+B 151 Model Statistics    SOLVE PLANT_DUAL Using LP From line 78
+B 164 Solution Report     SOLVE PLANT_DUAL Using LP From line 78
+F 197 REDCOST_DUAL
+F 201 RES_CONS_DUAL
+G 208 Y
+G 219 VREDCOST
